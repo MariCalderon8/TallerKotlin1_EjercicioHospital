@@ -1,5 +1,6 @@
 import models.Address
 import models.Hospital
+import models.Patient
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -21,10 +22,10 @@ fun main() {
                 doctorsManagement(hospital)
             }
             "2" -> {
-                printPatientMenu()
+                patientsManagement(hospital)
             }
             "3" -> println("Bye bye :D")
-            else -> println("¿Que no vio que ese numero no está en el menú? >:V")
+            else -> println("Lo sentimos, no tenemos esta opcion en nuestro menu.")
         }
         printMainMenu()
     }
@@ -46,7 +47,6 @@ fun doctorsManagement(hospital: Hospital){
                     println("Lo siento, no pudimos encontrar al medico que buscas. Revisa que la identificación esté bien escrita")
                 }
             }
-            //FIXME: No sé si validar cada campo uno a la vez
             "2" ->{
                 try {
                     println("Ingrese el nombre completo")
@@ -175,6 +175,111 @@ fun doctorsManagement(hospital: Hospital){
         printDoctorsMenu()
     }
 
+}
+
+fun patientsManagement(hospital: Hospital) {
+    printPatientMenu()
+    while (true) {
+        when (readLine()) {
+            "1" -> {
+                println("Ingrese ID del paciente:")
+                val id = readLine()!!
+                hospital.findPatientById(id)?.let { println(it) } ?: println("Paciente no encontrado")
+            }
+
+            "2" -> {
+                try {
+                    println("Nombre completo:")
+                    val name = readLine()!!
+                    println("ID:")
+                    val id = readLine()!!
+                    println("Género (M/F):")
+                    val gender = readLine()!!.uppercase()
+                    println("Email:")
+                    val email = readLine()!!
+                    println("Teléfono:")
+                    val phone = readLine()!!
+                    println("Calle:")
+                    val street = readLine()!!
+                    println("Número:")
+                    val number = readLine()!!.toInt()
+                    println("Barrio:")
+                    val neighborhood = readLine()!!
+                    println("Ciudad:")
+                    val city = readLine()!!
+                    println("Código postal:")
+                    val postalCode = readLine()!!
+                    println("¿Está internado? (S/N):")
+                    val isIntern = readLine()!!.uppercase() == "S"
+
+                    val address = Address(street, number, neighborhood, city, postalCode)
+                    val patient = Patient(name, id, gender, email, phone, address, isIntern)
+                    hospital.addPatient(patient)
+                    println("Paciente agregado exitosamente!")
+                } catch (e: Exception) {
+                    println("Error: ${e.message}")
+                }
+            }
+
+            "3" -> {
+                try {
+                    println("Ingrese ID del paciente a editar:")
+                    val id = readLine()!!
+                    println("Nuevo teléfono (deje vacío para no cambiar):")
+                    val phone = readLine()?.takeIf { it.isNotEmpty() }
+                    println("¿Cambiar dirección? (S/N):")
+                    val changeAddress = readLine()?.uppercase() == "S"
+                    val address = if (changeAddress) {
+                        println("Calle:");
+                        val street = readLine()!!
+                        println("Número:");
+                        val number = readLine()!!.toInt()
+                        println("Barrio:");
+                        val neighborhood = readLine()!!
+                        println("Ciudad:");
+                        val city = readLine()!!
+                        println("Código postal:");
+                        val postalCode = readLine()!!
+                        Address(street, number, neighborhood, city, postalCode)
+                    } else null
+                    println("¿Cambiar estado de internamiento? (S/N):")
+                    val isIntern = readLine()?.takeIf { it.isNotEmpty() }?.uppercase() == "S"
+
+                    hospital.updatePatient(id, phone, address, isIntern)
+                    println("Paciente actualizado!")
+                } catch (e: Exception) {
+                    println("Error: ${e.message}")
+                }
+            }
+
+            "4" -> {
+                println("Ingrese ID del paciente a eliminar:")
+                val id = readLine()!!
+                try {
+                    hospital.deletePatient(id)
+                    println("Paciente eliminado")
+                } catch (e: Exception) {
+                    println("Error: ${e.message}")
+                }
+            }
+
+            "5" -> {
+                val percentages = hospital.getPatientGenderPercentage()
+                if (percentages.isEmpty()) {
+                    println("No hay pacientes registrados")
+                } else {
+                    println("\nPORCENTAJE POR GÉNERO:")
+                    percentages.forEach { (gender, percent) ->
+                        println("$gender: ${"%.2f".format(percent)}%")
+                    }
+                }
+            }
+
+            "6" -> return
+            else -> println("Opción inválida")
+        }
+        printPatientMenu()
+    }
 }
 
 fun printMainMenu() {

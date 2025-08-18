@@ -161,6 +161,60 @@ class Hospital(var name:String, val NIT:String, address: Address) {
                 "Especialidad: ${oldestDoctor.specialty}"
     }
 
+
+    // Gestión de pacientes
+
+    fun addPatient(patient: Patient) {
+        if (internedPatients.any { it.identificationNumber == patient.identificationNumber }) {
+            throw IllegalArgumentException("Ya existe un paciente con esta identificación")
+        }
+        internedPatients.add(patient)
+    }
+
+    fun findPatientById(id: String): Patient? {
+        return internedPatients.find { it.identificationNumber == id }
+    }
+
+    fun updatePatient(
+        id: String,
+        newPhone: String? = null,
+        newAddress: Address? = null,
+        newIsIntern: Boolean? = null
+    ) {
+        val patient = findPatientById(id) ?: throw IllegalArgumentException("Paciente no encontrado")
+        newPhone?.let { patient.phoneNumber = it }
+        newAddress?.let { patient.address = it }
+        newIsIntern?.let { patient.isIntern = it }
+    }
+
+    fun deletePatient(id: String) {
+        if (!internedPatients.removeIf { it.identificationNumber == id }) {
+            throw IllegalArgumentException("Paciente no encontrado")
+        }
+    }
+
+    fun printAllPatients() {
+        if (internedPatients.isEmpty()) {
+            println("No hay pacientes registrados")
+            return
+        }
+        println("\nLISTA DE PACIENTES:")
+        internedPatients.forEach { println(it) }
+    }
+
+    // Porcentaje por género
+    fun getPatientGenderPercentage(): Map<String, Double> {
+        if (internedPatients.isEmpty()) return emptyMap()
+
+        val (male, female) = internedPatients.partition { it.gender.uppercase() == "M" }
+        val total = internedPatients.size.toDouble()
+
+        return mapOf(
+            "Masculino" to (male.size * 100 / total),
+            "Femenino" to (female.size * 100 / total)
+        )
+    }
+
     //TODO
 }
 
