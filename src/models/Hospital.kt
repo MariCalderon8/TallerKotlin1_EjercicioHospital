@@ -53,19 +53,38 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         doctors.add(newDoctor)
     }
 
-    fun deleteDoctor(id:String){
+    /*fun deleteDoctor(id:String){
         val existingDoctor:Doctor? = findDoctorById(id)
         if (existingDoctor == null){
             throw IllegalArgumentException("El doctor no existe")
+
+
+        }
+        doctors.remove(existingDoctor)
+    }*
+     */
+    fun deleteDoctor(id: String) {
+        val existingDoctor: Doctor? = findDoctorById(id)
+
+        if (existingDoctor == null) {
+            throw IllegalArgumentException("El doctor no existe")
+        }
+        if (existingDoctor.isActive && doctors.count { it.isActive } == 1) {
+            throw IllegalStateException("No se puede eliminar: debe haber al menos un médico activo")
         }
         doctors.remove(existingDoctor)
     }
+
 
     fun updateDoctor(identificationNumber:String, fullName:String?, gender:String?, email:String?, professionalLicense:String?, specialty:String?, salary: Double?, startYear: Int?, isActive: Boolean?){
         val existingDoctor:Doctor? = findDoctorById(identificationNumber)
 
         if (existingDoctor == null){
             throw IllegalArgumentException("El doctor no existe")
+        }
+
+        if (isActive == false && existingDoctor.isActive && doctors.count { it.isActive } == 1) {
+            throw IllegalStateException("No se puede desactivar: debe haber al menos un médico activo")
         }
 
         if (fullName != null && fullName.isNotEmpty()) existingDoctor.fullName = fullName
@@ -213,6 +232,11 @@ class Hospital(var name:String, val NIT:String, address: Address) {
             "Masculino" to (male.size * 100 / total),
             "Femenino" to (female.size * 100 / total)
         )
+    }
+
+    // Ultimo medico activo
+    fun hasAtLeastOneActiveDoctor(): Boolean {
+        return doctors.any { it.isActive }
     }
 
     //TODO
