@@ -139,16 +139,27 @@ fun doctorsManagement(hospital: Hospital){
                 }
             }
             "5" ->{
-
+                val total= hospital.calculateTotalSalaries()
+                println("TOTAL DE SALARIOS: $${"%.2f".format(total)}")
             }
-            "6" ->{
-
+            "6" -> {
+                val salariesBySpecialty = hospital.calculateSalariesBySpecialty()
+                println("TOTAL POR ESPECIALIDAD:")
+                salariesBySpecialty.forEach { println(it) }
             }
-            "7" ->{
-
+            "7" -> {
+                val counts = hospital.getDoctorsCountBySpecialty()
+                if (counts.isEmpty()) {
+                    println("No hay médicos registrados")
+                } else {
+                    println("\nCANTIDAD DE MÉDICOS POR ESPECIALIDAD:")
+                    for (item in counts) {
+                        println(item)
+                    }
+                }
             }
             "8" ->{
-
+                println("\n${hospital.getMostSeniorDoctor()}")
             }
             "9" ->{
                 hospital.printAllDoctors()

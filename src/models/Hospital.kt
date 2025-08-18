@@ -92,6 +92,75 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         }
     }
 
+    fun calculateTotalSalaries(): Double {
+        var total=0.0
+        for (doctor in doctors){
+            total += doctor.salary
+        }
+        return total
+    }
+
+    fun calculateSalariesBySpecialty(): List<String> {
+        val specialties = mutableSetOf<String>()
+        for (doctor in doctors) {
+            specialties.add(doctor.specialty)
+        }
+
+        //Calcular el total por especialidad
+        val results = mutableListOf<String>()
+        for (specialty in specialties) {
+            var total = 0.0
+            for (doctor in doctors) {
+                if (doctor.specialty == specialty) {
+                    total += doctor.salary
+                }
+            }
+            results.add("$specialty: $${"%,.2f".format(total)}")
+        }
+        return results
+    }
+
+    fun getDoctorsCountBySpecialty(): List<String> {
+        val result = mutableListOf<String>()
+
+        val specialties = mutableListOf<String>()
+        for (doctor in doctors) {
+            if (!specialties.contains(doctor.specialty)) {
+                specialties.add(doctor.specialty)
+            }
+        }
+
+        //médico por cada especialidad
+        for (specialty in specialties) {
+            var count = 0
+            for (doctor in doctors) {
+                if (doctor.specialty == specialty) {
+                    count++
+                }
+            }
+            result.add("$specialty: $count médico(s)")
+        }
+
+        return result
+    }
+
+    fun getMostSeniorDoctor(): String {
+        if (doctors.isEmpty()) {
+            return "No hay médicos registrados"
+        }
+
+        var oldestDoctor = doctors[0]
+        for (doctor in doctors) {
+            if (doctor.startYear < oldestDoctor.startYear) {
+                oldestDoctor = doctor
+            }
+        }
+
+        return "Médico más antiguo: ${oldestDoctor.fullName} " +
+                "(Año de ingreso: ${oldestDoctor.startYear}), " +
+                "Especialidad: ${oldestDoctor.specialty}"
+    }
+
     //TODO
 }
 
