@@ -191,30 +191,44 @@ fun patientsManagement(hospital: Hospital) {
                 try {
                     println("Nombre completo:")
                     val name = readLine()!!
+
                     println("ID:")
                     val id = readLine()!!
+
                     println("Género (M/F):")
                     val gender = readLine()!!.uppercase()
+
                     println("Email:")
                     val email = readLine()!!
+
                     println("Teléfono:")
                     val phone = readLine()!!
+
                     println("Calle:")
                     val street = readLine()!!
+
                     println("Número:")
                     val number = readLine()!!.toInt()
+
                     println("Barrio:")
                     val neighborhood = readLine()!!
+
                     println("Ciudad:")
                     val city = readLine()!!
+
                     println("Código postal:")
                     val postalCode = readLine()!!
-                    println("¿Está internado? (S/N):")
-                    val isIntern = readLine()!!.uppercase() == "S"
-
                     val address = Address(street, number, neighborhood, city, postalCode)
-                    val patient = Patient(name, id, gender, email, phone, address, isIntern)
-                    hospital.addPatient(patient)
+
+                    println("¿Está internado? (S/N):")
+                    val isInternInput = readLine()!!.uppercase()
+                    val isIntern = when (isInternInput) {
+                        "S" -> true
+                        "N" -> false
+                        else -> false
+                    }
+
+                    hospital.addPatient(name, id, gender, email, phone, address, isIntern)
                     println("Paciente agregado exitosamente!")
                 } catch (e: Exception) {
                     println("Error: ${e.message}")
@@ -225,8 +239,19 @@ fun patientsManagement(hospital: Hospital) {
                 try {
                     println("Ingrese ID del paciente a editar:")
                     val id = readLine()!!
+
+                    println("Nuevo nombre (deje vacío para no cambiar):")
+                    val name = readLine()?.takeIf { it.isNotEmpty() }
+
+                    println("Nuevo género (M/F) (deje vacío para no cambiar):")
+                    val gender = readLine()?.takeIf { it.isNotEmpty() }
+
+                    println("Nuevo email (deje vacío para no cambiar):")
+                    val email = readLine()?.takeIf { it.isNotEmpty() }
+
                     println("Nuevo teléfono (deje vacío para no cambiar):")
                     val phone = readLine()?.takeIf { it.isNotEmpty() }
+
                     println("¿Cambiar dirección? (S/N):")
                     val changeAddress = readLine()?.uppercase() == "S"
                     val address = if (changeAddress) {
@@ -243,10 +268,14 @@ fun patientsManagement(hospital: Hospital) {
                         Address(street, number, neighborhood, city, postalCode)
                     } else null
                     println("¿Cambiar estado de internamiento? (S/N):")
-                    val isIntern = readLine()?.takeIf { it.isNotEmpty() }?.uppercase() == "S"
+                    val internInput = readLine()?.uppercase()
+                    val isIntern: Boolean? = when (internInput) {
+                        "S" -> !hospital.findPatientById(id)!!.isIntern  
+                        "N" -> null   // no cambia nada
+                        else -> null
+                    }
 
-                    hospital.updatePatient(id, phone, address, isIntern)
-                    println("Paciente actualizado!")
+                    hospital.updatePatient(identificationNumber = id, fullName = name, gender = gender, email = email, phoneNumber = phone, address = address, isIntern = isIntern)
                 } catch (e: Exception) {
                     println("Error: ${e.message}")
                 }
@@ -275,7 +304,25 @@ fun patientsManagement(hospital: Hospital) {
                 }
             }
 
-            "6" -> return
+            "6" -> {
+                println("\nLISTA DE TODOS LOS PACIENTES:")
+                if (hospital.generalPatients.isEmpty()) {
+                    println("No hay pacientes registrados")
+                } else {
+                    hospital.generalPatients.forEach { println(it) }
+                }
+            }
+
+            "7" -> {
+                println("\nLISTA DE PACIENTES INTERNADOS:")
+                if (hospital.internedPatients.isEmpty()) {
+                    println("No hay pacientes internados")
+                } else {
+                    hospital.internedPatients.forEach { println(it) }
+                }
+            }
+
+            "8" -> return
             else -> println("Opción inválida")
         }
         printPatientMenu()
@@ -315,13 +362,15 @@ fun printDoctorsMenu(){
 fun printPatientMenu(){
     println("""
         ---------------------------------------
-        GESTIÓN DE MÉDICOS
+        GESTIÓN DE PACIENTES
         1. Buscar
         2. Agregar
         3. Editar
         4. Eliminar
         5. Obtener el porcentaje de pacientes según su género
-        6. Volver
+        6. Ver todos los pacientes
+        7. Ver paciente internados
+        8. Volver
         ---------------------------------------
         
     """.trimIndent())

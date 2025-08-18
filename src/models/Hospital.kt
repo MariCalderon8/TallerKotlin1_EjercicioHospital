@@ -6,8 +6,9 @@ class Hospital(var name:String, val NIT:String, address: Address) {
 
     val internedPatients: MutableList<Patient> = mutableListOf()
     val doctors: MutableList<Doctor> = mutableListOf()
+    val generalPatients: MutableList<Patient> = mutableListOf()
 
-    // Gestión de doctores
+    //Dcotors management
 
     fun findDoctorById(id:String): Doctor? {
         for (doctor in doctors){
@@ -53,16 +54,6 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         doctors.add(newDoctor)
     }
 
-    /*fun deleteDoctor(id:String){
-        val existingDoctor:Doctor? = findDoctorById(id)
-        if (existingDoctor == null){
-            throw IllegalArgumentException("El doctor no existe")
-
-
-        }
-        doctors.remove(existingDoctor)
-    }*
-     */
     fun deleteDoctor(id: String) {
         val existingDoctor: Doctor? = findDoctorById(id)
 
@@ -111,6 +102,107 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         }
     }
 
+    // Last active doctor
+    fun hasAtLeastOneActiveDoctor(): Boolean {
+        return doctors.any { it.isActive }
+    }
+
+
+    // Patients Management
+
+    fun findPatientById(id: String): Patient? {
+        for (patient in generalPatients) {
+            if (patient.identificationNumber == id) {
+                return patient
+            }
+        }
+        return null
+    }
+
+    fun addPatient(  fullName: String, identificationNumber: String, gender: String, email: String, phoneNumber: String, address: Address, isIntern: Boolean? = false) {
+        if (fullName.isEmpty() || identificationNumber.isEmpty() || gender.isEmpty() || email.isEmpty() || phoneNumber.isEmpty()) {
+            throw IllegalArgumentException("No pueden haber campos vacíos")
+        }
+
+        if (gender != "M" && gender != "F") {
+            throw IllegalArgumentException("El género del paciente debe ser 'M' o 'F'")
+        }
+
+        val existingPatientById: Patient? = findPatientById(identificationNumber)
+        if (existingPatientById != null) {
+            throw IllegalArgumentException("Ya existe un paciente con esta identificación")
+        }
+
+        val internStatus = isIntern ?: false
+        val newPatient = Patient(fullName, identificationNumber, gender, email, phoneNumber, address, internStatus)
+
+        generalPatients.add(newPatient)
+
+        if(internStatus){
+            internedPatients.add(newPatient)
+        }
+
+    }
+
+    fun deletePatient(identificationNumber: String){
+        val existingPatient: Patient? = findPatientById(identificationNumber)
+
+        if(existingPatient == null){
+            throw IllegalArgumentException("El paciente no existe")
+        }
+
+        generalPatients.remove(existingPatient)
+        internedPatients.remove(existingPatient)
+    }
+
+    fun updatePatient(identificationNumber: String, fullName: String?, gender: String?, email: String?, phoneNumber: String?, address: Address?, isIntern: Boolean?) {
+        val existingPatient: Patient? = findPatientById(identificationNumber)
+
+        if (existingPatient == null) {
+            throw IllegalArgumentException("El paciente no existe")
+        }
+
+        if (fullName != null && fullName.isNotEmpty()) existingPatient.fullName = fullName
+        if (gender != null && gender.isNotEmpty() && (gender.uppercase() == "M" || gender.uppercase() == "F")) existingPatient.gender = gender
+        if (email != null && email.isNotEmpty()) existingPatient.email = email
+        if (phoneNumber != null && phoneNumber.isNotEmpty()) existingPatient.phoneNumber = phoneNumber
+        if (address != null) existingPatient.address = address
+        if (isIntern != null){
+            val wasIntern = existingPatient.isIntern
+            existingPatient.isIntern = isIntern
+
+            if(wasIntern && !isIntern){
+                internedPatients.remove(existingPatient)
+            }else if(!wasIntern && isIntern){
+                internedPatients.add(existingPatient)
+            }
+        }
+
+    }
+
+    fun printAllPatients() {
+        if (generalPatients.isEmpty()) {
+            println("No hay pacientes registrados")
+            return
+        }
+
+        println("Lista de pacientes en el hospital $name:")
+        for (patient in generalPatients) {
+            println()
+            println(patient.toString())
+            println()
+        }
+
+        println("\nPacientes internados:")
+        for (patient in internedPatients) {
+            println()
+            println(patient.toString())
+            println()
+        }
+    }
+
+    //Special functions
+
     fun calculateTotalSalaries(): Double {
         var total=0.0
         for (doctor in doctors){
@@ -139,6 +231,21 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         return results
     }
 
+    fun getPatientGenderPercentage(): Map<String, Double> {
+        if (generalPatients.isEmpty()){
+            return emptyMap()
+        }
+
+        val total = generalPatients.size.toDouble()
+        val males = generalPatients.count { it.gender.uppercase() == "M" }
+        val females = generalPatients.count { it.gender.uppercase() == "F" }
+
+        return mapOf(
+            "Masculino" to (males * 100 / total),
+            "Femenino" to (females * 100 / total)
+        )
+    }
+
     fun getDoctorsCountBySpecialty(): List<String> {
         val result = mutableListOf<String>()
 
@@ -163,6 +270,8 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         return result
     }
 
+
+
     fun getMostSeniorDoctor(): String {
         if (doctors.isEmpty()) {
             return "No hay médicos registrados"
@@ -180,65 +289,5 @@ class Hospital(var name:String, val NIT:String, address: Address) {
                 "Especialidad: ${oldestDoctor.specialty}"
     }
 
-
-    // Gestión de pacientes
-
-    fun addPatient(patient: Patient) {
-        if (internedPatients.any { it.identificationNumber == patient.identificationNumber }) {
-            throw IllegalArgumentException("Ya existe un paciente con esta identificación")
-        }
-        internedPatients.add(patient)
-    }
-
-    fun findPatientById(id: String): Patient? {
-        return internedPatients.find { it.identificationNumber == id }
-    }
-
-    fun updatePatient(
-        id: String,
-        newPhone: String? = null,
-        newAddress: Address? = null,
-        newIsIntern: Boolean? = null
-    ) {
-        val patient = findPatientById(id) ?: throw IllegalArgumentException("Paciente no encontrado")
-        newPhone?.let { patient.phoneNumber = it }
-        newAddress?.let { patient.address = it }
-        newIsIntern?.let { patient.isIntern = it }
-    }
-
-    fun deletePatient(id: String) {
-        if (!internedPatients.removeIf { it.identificationNumber == id }) {
-            throw IllegalArgumentException("Paciente no encontrado")
-        }
-    }
-
-    fun printAllPatients() {
-        if (internedPatients.isEmpty()) {
-            println("No hay pacientes registrados")
-            return
-        }
-        println("\nLISTA DE PACIENTES:")
-        internedPatients.forEach { println(it) }
-    }
-
-    // Porcentaje por género
-    fun getPatientGenderPercentage(): Map<String, Double> {
-        if (internedPatients.isEmpty()) return emptyMap()
-
-        val (male, female) = internedPatients.partition { it.gender.uppercase() == "M" }
-        val total = internedPatients.size.toDouble()
-
-        return mapOf(
-            "Masculino" to (male.size * 100 / total),
-            "Femenino" to (female.size * 100 / total)
-        )
-    }
-
-    // Ultimo medico activo
-    fun hasAtLeastOneActiveDoctor(): Boolean {
-        return doctors.any { it.isActive }
-    }
-
-    //TODO
 }
 
