@@ -9,6 +9,7 @@ fun main() {
     val hospital: Hospital = Hospital("Sana que sana Colita de Rana", "2345678", hospitalAddress)
 
     println("""
+        
         !BIENVIENIDO AL SISTEMA CLÍNICO DE ${hospital.name.uppercase()}!
         ¿Cómo podemos ayudarte hoy? :D
         
@@ -38,6 +39,7 @@ fun doctorsManagement(hospital: Hospital){
         otherResponse = readLine()
         when(otherResponse){
             "1" ->{
+                println("----- 1. Buscar Médico -----")
                 println("Ingrese el ID del médico")
                 var identificationNumber = readLine()!!
                 var doctor = hospital.findDoctorById(identificationNumber)
@@ -49,6 +51,7 @@ fun doctorsManagement(hospital: Hospital){
             }
             "2" ->{
                 try {
+                    println("----- 2. Agregar Médico -----")
                     println("Nombre completo:")
                     val fullName = readLine()!!
 
@@ -92,11 +95,11 @@ fun doctorsManagement(hospital: Hospital){
             }
             "3" ->{
                 try {
+                    println("----- 3. Actualización de datos del Médico (deje vacío para no editar) -----")
                     println("Ingrese el ID del médico a editar")
                     val identificationNumber = readLine()!!
                     val doctor = hospital.findDoctorById(identificationNumber)
                     if (doctor != null) {
-                        println("---- Actualización de datos (deje vacío para no cambiar) -----")
 
                         println("Nombre completo:")
                         val fullName = readLine()
@@ -144,6 +147,7 @@ fun doctorsManagement(hospital: Hospital){
                 }
             }
             "4" ->{
+                println("----- 4. Eliminar Médico -----")
                 try {
                     println("Ingrese el ID del médico a eliminar:")
                     val identificationNumber = readLine()
@@ -179,9 +183,24 @@ fun doctorsManagement(hospital: Hospital){
                 println("\n${hospital.getMostSeniorDoctor()}")
             }
             "9" ->{
+                println("----- 9. Asignación de pacientes -----")
+                try {
+                    println("Ingrese el ID del médico")
+                    val doctorID = readLine()!!
+
+                    println("Ingrese el ID del paciente")
+                    val patientID = readLine()!!
+
+                    hospital.assignPatientToDoctor(doctorID, patientID)
+                    println("Paciente asignado exitosamente")
+                } catch (e: Exception){
+                    println(e.message)
+                }
+            }
+            "10" ->{
                 hospital.printAllDoctors()
             }
-            "10" -> {
+            "11" -> {
                 return
             }
             else ->{
@@ -199,12 +218,14 @@ fun patientsManagement(hospital: Hospital) {
     while (true) {
         when (readLine()) {
             "1" -> {
+                println("----- 1. Buscar paciente -----")
                 println("Ingrese ID del paciente:")
                 val id = readLine()!!
                 hospital.findPatientById(id)?.let { println(it) } ?: println("Lo sentimos, no pudimos encontrar al paciente que buscas. Revisa que el ID esté bien escrito")
             }
 
             "2" -> {
+                println("----- 2. Agregar paciente -----")
                 try {
                     println("Nombre completo:")
                     val name = readLine()!!
@@ -240,8 +261,8 @@ fun patientsManagement(hospital: Hospital) {
                     println("¿Está internado? (S/N):")
                     val isInternInput = readLine()!!.uppercase()
                     val isIntern = when (isInternInput) {
-                        "S" -> true
-                        "N" -> false
+                        "S", "s" -> true
+                        "N", "n" -> false
                         else -> false
                     }
 
@@ -253,6 +274,7 @@ fun patientsManagement(hospital: Hospital) {
             }
 
             "3" -> {
+                println("----- 3. Actualización de datos del paciente -----")
                 try {
                     println("Ingrese ID del paciente a editar:")
                     val id = readLine()!!
@@ -299,6 +321,7 @@ fun patientsManagement(hospital: Hospital) {
             }
 
             "4" -> {
+                println("----- 4. Eliminar paciente -----")
                 println("Ingrese ID del paciente a eliminar:")
                 val id = readLine()!!
                 try {
@@ -369,8 +392,9 @@ fun printDoctorsMenu(){
         6. Calcular el total de salarios de todos los médicos por especialidad
         7. Obtener la cantidad de médicos según su especialidad
         8. Identificar el médico con más antigüedad e indicar su especialidad
-        9. Imprimir todos los doctores
-        10. Volver
+        9. Asignar paciente
+        10. Imprimir todos los doctores
+        11. Volver
         ---------------------------------------
         
         """.trimIndent())

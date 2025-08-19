@@ -10,6 +10,22 @@ class Hospital(var name:String, val NIT:String, address: Address) {
 
     //Dcotors management
 
+    fun findPersonById(id: String): Person? {
+        for (doctor in doctors){
+            if (doctor.identificationNumber == id){
+                return doctor
+            }
+        }
+
+        for (patient in generalPatients) {
+            if (patient.identificationNumber == id) {
+                return patient
+            }
+        }
+
+        return null
+    }
+
     fun findDoctorById(id:String): Doctor? {
         for (doctor in doctors){
             if (doctor.identificationNumber == id){
@@ -33,7 +49,7 @@ class Hospital(var name:String, val NIT:String, address: Address) {
             throw IllegalArgumentException("No pueden haber campos vacíos")
         }
 
-        if(gender != "M" && gender != "F"){
+        if(gender.uppercase() != "M" && gender.uppercase() != "F"){
             throw IllegalArgumentException("El género de la persona debe ser diferente a 'M' o 'F'")
         }
 
@@ -41,9 +57,9 @@ class Hospital(var name:String, val NIT:String, address: Address) {
             throw IllegalArgumentException("El año de ingreso no puede ser superior al actual o menor a 1900") // Esto me lo inventé yo xd
         }
 
-        val existingDoctorById:Doctor? = findDoctorById(identificationNumber)
-        if (existingDoctorById != null){
-            throw IllegalArgumentException("Ya existe un doctor con esta identificación")
+        val existingPerson:Person? = findPersonById(identificationNumber)
+        if (existingPerson != null){
+            throw IllegalArgumentException("Esta identificación ya se encuentra registrada")
         }
         val existingDoctorByLicense = findDoctorByProfessionalLicense(professionalLicense)
         if (existingDoctorByLicense != null){
@@ -107,6 +123,27 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         return doctors.any { it.isActive }
     }
 
+    fun assignPatientToDoctor(doctorID: String, patientID: String){
+        if (doctorID == ""){
+            throw IllegalArgumentException("El ID del médico no puede estár vacío")
+        }
+        if (patientID == ""){
+            throw IllegalArgumentException("El ID del paciente no puede estár vacío")
+        }
+        val doctor = findDoctorById(doctorID)
+        if (doctor == null){
+            throw IllegalArgumentException("Lo sentimos, no pudimos encontrar al médico que buscas. Revisa que el ID esté bien escrito")
+        }
+        val patient = findPatientById(patientID)
+        if (patient == null){
+            throw IllegalArgumentException("Lo sentimos, no pudimos encontrar al paciente que buscas. Revisa que el ID esté bien escrito")
+        }
+        if (!doctor.isActive){
+            throw IllegalArgumentException("El doctor ${doctor.fullName} no se encuentra activo y no puede recibir pacientes ahora")
+        }
+        doctor.assignPatient(patient)
+    }
+
 
     // Patients Management
 
@@ -124,13 +161,13 @@ class Hospital(var name:String, val NIT:String, address: Address) {
             throw IllegalArgumentException("No pueden haber campos vacíos")
         }
 
-        if (gender != "M" && gender != "F") {
+        if (gender.uppercase() != "M" && gender.uppercase() != "F") {
             throw IllegalArgumentException("El género del paciente debe ser 'M' o 'F'")
         }
 
-        val existingPatientById: Patient? = findPatientById(identificationNumber)
-        if (existingPatientById != null) {
-            throw IllegalArgumentException("Ya existe un paciente con esta identificación")
+        val existingPerson: Person? = findPersonById(identificationNumber)
+        if (existingPerson != null) {
+            throw IllegalArgumentException("Esta identificación ya se encuentra registrada")
         }
 
         val internStatus = isIntern ?: false
