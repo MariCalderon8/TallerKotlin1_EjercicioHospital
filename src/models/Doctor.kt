@@ -17,18 +17,12 @@ class Doctor(fullName:String, identificationNumber:String, gender:String, email:
         assignedPatients.add(patient)
     }
 
-    fun patientsStringList(): String {
-        var patientsList = ""
-        for(patient in assignedPatients){
-            patientsList = patientsList + """   ID:${patient.identificationNumber} Nombre: ${patient.fullName}\n"""
-        }
-        if (patientsList == "") {
-            return """  No tiene pacientes asignados"""
-        }
-        return patientsList
-    }
-
     override fun toString(): String {
+        val pacientesNombres = if (assignedPatients.isEmpty()) {
+            "No tiene pacientes asignados"
+        } else {
+            assignedPatients.joinToString(" — ") { "ID: ${it.identificationNumber} Nombre: ${it.fullName}" }
+        }
         return """
             Doctor: $fullName
             Identificación: $identificationNumber
@@ -40,7 +34,7 @@ class Doctor(fullName:String, identificationNumber:String, gender:String, email:
             Año de ingreso: $startYear
             Estado: ${if (isActive) "Activo" else "Inactivo"}
             Pacientes: 
-            ${patientsStringList().prependIndent("      ")}
+            $pacientesNombres
         """.trimIndent()
     }
 

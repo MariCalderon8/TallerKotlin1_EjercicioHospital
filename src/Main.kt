@@ -80,7 +80,11 @@ fun doctorsManagement(hospital: Hospital){
 
                     println("¿Está activo? (S/N)")
                     val isActiveString = readLine()!!
-                    val isActive = if (isActiveString.isNotEmpty() && isActiveString.uppercase() == "S") true else false
+                    val isActive = when (isActiveString) {
+                        "S", "s" -> true
+                        "N", "n" -> false
+                        else -> false
+                    }
 
                     hospital.addNewDoctor(fullName,identificationNumber, gender, email, professionalLicense, specialty, salary, startYear, isActive)
                     println("Médico creado exitosamente")
@@ -143,7 +147,7 @@ fun doctorsManagement(hospital: Hospital){
                 } catch (e: NumberFormatException) {
                     println("El año y el salario deben ser un dato numérico")
                 } catch (e: Exception){
-                    println("ERROR EDITANDO AL MÉDICO")
+                    println(e.message)
                 }
             }
             "4" ->{
@@ -309,8 +313,8 @@ fun patientsManagement(hospital: Hospital) {
                     println("¿Cambiar estado de internamiento? (S/N):")
                     val internInput = readLine()?.uppercase()
                     val isIntern: Boolean? = when (internInput) {
-                        "S" -> !hospital.findPatientById(id)!!.isIntern  
-                        "N" -> null   // no cambia nada
+                        "S", "s" -> !hospital.findPatientById(id)!!.isIntern
+                        "N", "n" -> null   // no cambia nada
                         else -> null
                     }
 
