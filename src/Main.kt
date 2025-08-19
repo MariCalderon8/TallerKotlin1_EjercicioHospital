@@ -1,13 +1,74 @@
 import models.Address
+import models.Converter
 import models.Hospital
 import models.Patient
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 fun main() {
     val hospitalAddress: Address = Address("Carrera", 12, "San José", "Armenia", "345678")
     val hospital: Hospital = Hospital("Sana que sana Colita de Rana", "2345678", hospitalAddress)
 
+    println("¡BIENVENIDO! ¿Qué deseas hacer hoy?")
+    while (true) {
+        println("""
+            ---------------------------------
+            MENÚ PRINCIPAL
+            1. Calculadora Binaria/Decimal
+            2. Gestión del Hospital
+            3. Créditos
+            4. Salir
+            ---------------------------------
+        """.trimIndent())
+
+        when (readLine()) {
+            "1" -> binaryCalculatorMenu()
+            "2" -> hospitalMenu(hospital)
+            "3" -> {
+                println("Sebastian Botero Gonzalez - 240220231066")
+                println("Mariluz Calderón Guevara - 240220231078")
+                println("Maria Camila Castro Cardona - 240220231077")
+            }
+            "4" -> {
+                println("BYE BYE :D")
+                return
+            }
+            else -> println("Entrada no válida")
+        }
+    }
+}
+
+/* ------------------ SECCIÓN CALCULADORA ------------------ */
+fun binaryCalculatorMenu() {
+    val converter = Converter()
+    while (true) {
+        println("""
+            ---------------------------------
+            CALCULADORA BINARIO/DECIMAL
+            1. Convertir de decimal a binario
+            2. Convertir de binario a decimal
+            3. Volver
+            ---------------------------------
+        """.trimIndent())
+
+        when (readLine()) {
+            "1" -> {
+                println("Ingrese el número DECIMAL para convertir a BINARIO:")
+                val decimal = readLine()!!.toInt()
+                println("$decimal en binario es ${converter.fromDecimalToBinary(decimal)}")
+            }
+            "2" -> {
+                println("Ingrese el número BINARIO para convertir a DECIMAL:")
+                val binary: String = readLine()!!
+                println("$binary en decimal es ${converter.fromBinaryToDecimal(binary)}")
+            }
+            "3" -> return
+            else -> println("Entrada no válida")
+        }
+    }
+}
+
+/* ------------------ SECCIÓN HOSPITAL ------------------ */
+
+fun hospitalMenu(hospital: Hospital) {
     println("""
         
         !BIENVIENIDO AL SISTEMA CLÍNICO DE ${hospital.name.uppercase()}!
@@ -19,13 +80,9 @@ fun main() {
     while(true){
         userResponse = readLine()
         when(userResponse) {
-            "1" -> {
-                doctorsManagement(hospital)
-            }
-            "2" -> {
-                patientsManagement(hospital)
-            }
-            "3" -> println("Bye bye :D")
+            "1" -> doctorsManagement(hospital)
+            "2" -> patientsManagement(hospital)
+            "3" -> return
             else -> println("Lo sentimos, no tenemos esta opcion en nuestro menu.")
         }
         printMainMenu()
