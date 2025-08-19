@@ -38,41 +38,50 @@ fun doctorsManagement(hospital: Hospital){
         otherResponse = readLine()
         when(otherResponse){
             "1" ->{
-                println("Ingrese el numero de identificación")
+                println("Ingrese el ID del médico")
                 var identificationNumber = readLine()!!
                 var doctor = hospital.findDoctorById(identificationNumber)
                 if (doctor != null) {
                     println(doctor.toString())
                 } else {
-                    println("Lo siento, no pudimos encontrar al medico que buscas. Revisa que la identificación esté bien escrita")
+                    println("Lo sentimos, no pudimos encontrar al médico que buscas. Revisa que el ID esté bien escrito")
                 }
             }
             "2" ->{
                 try {
-                    println("Ingrese el nombre completo")
+                    println("Nombre completo:")
                     val fullName = readLine()!!
-                    println("Ingrese el numero de identificación")
+
+                    println("ID:")
                     val identificationNumber = readLine()!!
-                    println("Ingrese género (M / F)")
+
+                    println("Género (M/F):")
                     val gender = readLine()!!
-                    println("Ingrese la dirección de email")
+
+                    println("Email:")
                     val email = readLine()!!
-                    println("Ingrese el numero de la licencia profesional")
+
+                    println("Número de la licencia profesional")
                     val professionalLicense = readLine()!!
-                    println("Ingrese la especialidad")
+
+                    println("Especialidad:")
                     val specialty = readLine()!!
-                    println("Ingrese el salario")
+
+                    println("Salario:")
                     val salaryString = readLine()
                     val salary: Double = if (salaryString == null || salaryString.isEmpty()) 0.0 else salaryString.toDouble()
-                    println("Ingrese el año de ingreso")
+
+                    println("Año de ingreso:")
                     val startYearString = readLine()
                     val startYear: Int = if (startYearString == null || startYearString.isEmpty()) 0 else startYearString.toInt()
-                    println("¿Está activo? (S / N)")
+
+                    println("¿Está activo? (S/N)")
                     val isActiveString = readLine()!!
                     val isActive = if (isActiveString.isNotEmpty() && isActiveString.uppercase() == "S") true else false
 
                     hospital.addNewDoctor(fullName,identificationNumber, gender, email, professionalLicense, specialty, salary, startYear, isActive)
-                    println("MÉDICO CREADO CORRECTAMENTE")
+                    println("Médico creado exitosamente")
+
                 } catch (e: IllegalArgumentException) {
                     println(e.message)
                 } catch (e: NumberFormatException) {
@@ -83,39 +92,47 @@ fun doctorsManagement(hospital: Hospital){
             }
             "3" ->{
                 try {
-                    println("Ingrese el numero de identificación del doctor que desea editar")
+                    println("Ingrese el ID del médico a editar")
                     val identificationNumber = readLine()!!
                     val doctor = hospital.findDoctorById(identificationNumber)
                     if (doctor != null) {
-                        println("Ingrese el nuevo nombre completo")
+                        println("---- Actualización de datos (deje vacío para no cambiar) -----")
+
+                        println("Nombre completo:")
                         val fullName = readLine()
-                        println("Ingrese género (M / F)")
+
+                        println("Ingrese género (M/F):")
                         val gender = readLine()
-                        println("Ingrese la dirección de email")
+
+                        println("Email:")
                         val email = readLine()
-                        println("Ingrese el numero de la licencia profesional")
+
+                        println("Número de la licencia profesional:")
                         val professionalLicense = readLine()
-                        println("Ingrese la especialidad")
+
+                        println("Especialidad:")
                         val specialty = readLine()
-                        println("Ingrese el salario")
+
+                        println("Salario:")
                         val salaryString = readLine()
                         val salary: Double? = if (salaryString != null && salaryString.isNotEmpty()) salaryString.toDouble() else null
-                        println("Ingrese el año de ingreso")
+
+                        println("Año de ingreso:")
                         val startYearString = readLine()
                         val startYear: Int? = if (startYearString != null && startYearString.isNotEmpty()) startYearString.toInt() else null
+
                         println("¿Está activo? (S / N)")
                         val isActiveString = readLine()
-                        var isActive: Boolean? = null
-                        if (isActiveString != null && isActiveString.uppercase() == "S"){
-                            isActive = true
-                        } else if (isActiveString != null && isActiveString.uppercase() == "N"){
-                            isActive = false
+                        val isActive = when (isActiveString) {
+                            "S", "s" -> true
+                            "N", "n" -> false
+                            else -> false
                         }
 
                         hospital.updateDoctor(identificationNumber, fullName, gender, email, professionalLicense, specialty, salary, startYear, isActive)
-                        println("MÉDICO ACTUALIZADO CORRECTAMENTE")
+                        println("Médico actualizado exitosamente")
                     } else {
-                        println("Lo siento, no pudimos encontrar al medico que buscas. Revisa que la identificación esté bien escrita")
+                        println("Lo sentimos, no pudimos encontrar al médico que buscas. Revisa que el ID esté bien escrito")
                     }
 
                 } catch (e: IllegalArgumentException) {
@@ -128,11 +145,11 @@ fun doctorsManagement(hospital: Hospital){
             }
             "4" ->{
                 try {
-                    println("Ingrese el numero de identificación del doctor que desea eliminar")
+                    println("Ingrese el ID del médico a eliminar:")
                     val identificationNumber = readLine()
                     if (identificationNumber != null && identificationNumber.isNotEmpty()){
                         hospital.deleteDoctor(identificationNumber)
-                        println("MÉDICO ELIMINADO CORRECTAMENTE")
+                        println("Médico eliminado exitosamente")
                     }
                 } catch (e: Exception) {
                     println(e.message)
@@ -168,7 +185,7 @@ fun doctorsManagement(hospital: Hospital){
                 return
             }
             else ->{
-
+                println("Opción inválida")
             }
 
         }
@@ -184,7 +201,7 @@ fun patientsManagement(hospital: Hospital) {
             "1" -> {
                 println("Ingrese ID del paciente:")
                 val id = readLine()!!
-                hospital.findPatientById(id)?.let { println(it) } ?: println("Paciente no encontrado")
+                hospital.findPatientById(id)?.let { println(it) } ?: println("Lo sentimos, no pudimos encontrar al paciente que buscas. Revisa que el ID esté bien escrito")
             }
 
             "2" -> {
@@ -229,7 +246,7 @@ fun patientsManagement(hospital: Hospital) {
                     }
 
                     hospital.addPatient(name, id, gender, email, phone, address, isIntern)
-                    println("Paciente agregado exitosamente!")
+                    println("Paciente agregado exitosamente")
                 } catch (e: Exception) {
                     println("Error: ${e.message}")
                 }
@@ -286,7 +303,7 @@ fun patientsManagement(hospital: Hospital) {
                 val id = readLine()!!
                 try {
                     hospital.deletePatient(id)
-                    println("Paciente eliminado")
+                    println("Paciente eliminado exitosamente")
                 } catch (e: Exception) {
                     println("Error: ${e.message}")
                 }
