@@ -146,12 +146,10 @@ fun doctorsManagement(hospital: Hospital){
                     hospital.addNewDoctor(fullName,identificationNumber, gender, email, professionalLicense, specialty, salary, startYear, isActive)
                     println("Médico creado exitosamente")
 
-                } catch (e: IllegalArgumentException) {
-                    println(e.message)
                 } catch (e: NumberFormatException) {
                     println("El año y el salario deben ser un dato numérico")
                 } catch (e: Exception){
-                    println("ERROR CREANDO AL MÉDICO")
+                    println(e.message)
                 }
             }
             "3" ->{
@@ -190,7 +188,7 @@ fun doctorsManagement(hospital: Hospital){
                         val isActive = when (isActiveString) {
                             "S", "s" -> true
                             "N", "n" -> false
-                            else -> false
+                            else -> null
                         }
 
                         hospital.updateDoctor(identificationNumber, fullName, gender, email, professionalLicense, specialty, salary, startYear, isActive)
@@ -199,8 +197,6 @@ fun doctorsManagement(hospital: Hospital){
                         println("Lo sentimos, no pudimos encontrar al médico que buscas. Revisa que el ID esté bien escrito")
                     }
 
-                } catch (e: IllegalArgumentException) {
-                    println(e.message)
                 } catch (e: NumberFormatException) {
                     println("El año y el salario deben ser un dato numérico")
                 } catch (e: Exception){
@@ -330,6 +326,9 @@ fun patientsManagement(hospital: Hospital) {
 
                     hospital.addPatient(name, id, gender, email, phone, address, isIntern)
                     println("Paciente agregado exitosamente")
+
+                } catch (e: NumberFormatException) {
+                    println("Error: El número de la calle debe ser un dato numérico")
                 } catch (e: Exception) {
                     println("Error: ${e.message}")
                 }
@@ -377,6 +376,8 @@ fun patientsManagement(hospital: Hospital) {
                     }
 
                     hospital.updatePatient(identificationNumber = id, fullName = name, gender = gender, email = email, phoneNumber = phone, address = address, isIntern = isIntern)
+                } catch (e: NumberFormatException) {
+                    println("Error: El número de la calle debe ser un dato numérico")
                 } catch (e: Exception) {
                     println("Error: ${e.message}")
                 }

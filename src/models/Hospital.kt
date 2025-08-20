@@ -8,7 +8,7 @@ class Hospital(var name:String, val NIT:String, address: Address) {
     val doctors: MutableList<Doctor> = mutableListOf()
     val generalPatients: MutableList<Patient> = mutableListOf()
 
-    //Dcotors management
+    //Doctors management
 
     fun findPersonById(id: String): Person? {
         for (doctor in doctors){
@@ -63,7 +63,7 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         }
         val existingDoctorByLicense = findDoctorByProfessionalLicense(professionalLicense)
         if (existingDoctorByLicense != null){
-            throw IllegalArgumentException("Ya existe un doctor identificado con esta licensia profesional")
+            throw IllegalArgumentException("Ya existe otro doctor identificado con esta licencia profesional")
         }
 
         val newDoctor = Doctor(fullName, identificationNumber, gender.uppercase(), email, professionalLicense, specialty, salary, startYear, isActive)
@@ -97,7 +97,13 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         if (fullName != null && fullName.isNotEmpty()) existingDoctor.fullName = fullName
         if (gender != null && gender.isNotEmpty() && (gender.uppercase() == "M" || gender.uppercase() == "F")) existingDoctor.gender = gender
         if (email != null && email.isNotEmpty()) existingDoctor.email = email
-        if (professionalLicense != null && professionalLicense.isNotEmpty()) existingDoctor.professionalLicense = professionalLicense
+        if (professionalLicense != null && professionalLicense.isNotEmpty()) {
+            val existingDoctorByLicense = findDoctorByProfessionalLicense(professionalLicense)
+            if (existingDoctorByLicense != null && existingDoctorByLicense.identificationNumber != existingDoctor.identificationNumber) {
+                throw IllegalArgumentException("Ya existe un doctor identificado con esta licencia profesional")
+            }
+            existingDoctor.professionalLicense = professionalLicense
+        }
         if (specialty != null && specialty.isNotEmpty()) existingDoctor.specialty = specialty
         if (salary != null && salary > 0.0) existingDoctor.salary = salary
         if (startYear != null && (startYear < LocalDate.now().year && startYear > 1900)) existingDoctor.startYear = startYear
@@ -137,9 +143,6 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         val patient = findPatientById(patientID)
         if (patient == null){
             throw IllegalArgumentException("Lo sentimos, no pudimos encontrar al paciente que buscas. Revisa que el ID esté bien escrito")
-        }
-        if (!doctor.isActive){
-            throw IllegalArgumentException("El doctor ${doctor.fullName} no se encuentra activo y no puede recibir pacientes ahora")
         }
         doctor.assignPatient(patient)
     }
