@@ -54,7 +54,7 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         }
 
         if(startYear > LocalDate.now().year || startYear < 1900) {
-            throw IllegalArgumentException("El año de ingreso no puede ser superior al actual o menor a 1900") // Esto me lo inventé yo xd
+            throw IllegalArgumentException("El año de ingreso no puede ser superior al actual o menor a 1900")
         }
 
         val existingPerson:Person? = findPersonById(identificationNumber)
@@ -66,7 +66,7 @@ class Hospital(var name:String, val NIT:String, address: Address) {
             throw IllegalArgumentException("Ya existe un doctor identificado con esta licensia profesional")
         }
 
-        val newDoctor = Doctor(fullName, identificationNumber, gender, email, professionalLicense, specialty, salary, startYear, isActive)
+        val newDoctor = Doctor(fullName, identificationNumber, gender.uppercase(), email, professionalLicense, specialty, salary, startYear, isActive)
         doctors.add(newDoctor)
     }
 
@@ -161,6 +161,10 @@ class Hospital(var name:String, val NIT:String, address: Address) {
             throw IllegalArgumentException("No pueden haber campos vacíos")
         }
 
+        if (address.street.isEmpty() || address.city.isEmpty() || address.postalCode.isEmpty() || address.neighborhood.isEmpty() || address.number < 1){
+            throw IllegalArgumentException("Hay campos vacíos o no válidos en la dirección. Vuelva a intentar")
+        }
+
         if (gender.uppercase() != "M" && gender.uppercase() != "F") {
             throw IllegalArgumentException("El género del paciente debe ser 'M' o 'F'")
         }
@@ -171,7 +175,7 @@ class Hospital(var name:String, val NIT:String, address: Address) {
         }
 
         val internStatus = isIntern ?: false
-        val newPatient = Patient(fullName, identificationNumber, gender, email, phoneNumber, address, internStatus)
+        val newPatient = Patient(fullName, identificationNumber, gender.uppercase(), email, phoneNumber, address, internStatus)
 
         generalPatients.add(newPatient)
 

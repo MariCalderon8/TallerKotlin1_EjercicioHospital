@@ -307,7 +307,8 @@ fun patientsManagement(hospital: Hospital) {
                     val street = readLine()!!
 
                     println("Número:")
-                    val number = readLine()!!.toInt()
+                    val numberString = readLine()
+                    val number: Int = if (numberString == null || numberString.isEmpty()) -1 else numberString.toInt()
 
                     println("Barrio:")
                     val neighborhood = readLine()!!
